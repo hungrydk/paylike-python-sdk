@@ -38,10 +38,10 @@ class PaylikeApiClient:
             "amount": self._convert_to_paylike_amount(amount)
         })
 
-    def create_payment_from_saved_card(self, card_id, currency, amount, descriptior=''):
+    def create_payment_from_saved_card(self, card_id, currency, amount, descriptor=''):
         return self._call_api('/merchants/%s/transactions/', method='POST', data={
             "cardId": card_id,
-            "descriptor": descriptior,
+            "descriptor": descriptor,
             "currency": currency,
             "amount": self._convert_to_paylike_amount(amount)
         })
