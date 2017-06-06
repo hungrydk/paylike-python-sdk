@@ -15,12 +15,12 @@ class PaylikeApiClient:
         return self._call_api('/transaction/%s/voids' % transaction_id,
                               method='POST',
                               data={
-                                  "amount": self._convert_to_paylike_amount(amount),
+                                  "amount": self.convert_to_paylike_amount(amount),
                               })
 
     def capture_transaction(self, transaction_id, amount, descriptor='', currency=None):
         data = {
-            "amount": self._convert_to_paylike_amount(amount),
+            "amount": self.convert_to_paylike_amount(amount),
             "descriptor": descriptor
         }
         if currency is not None:
@@ -35,7 +35,7 @@ class PaylikeApiClient:
             "transactionId": transaction_id,
             "descriptor": descriptior,
             "currency": currency,
-            "amount": self._convert_to_paylike_amount(amount)
+            "amount": self.convert_to_paylike_amount(amount)
         })
 
     def create_payment_from_saved_card(self, card_id, currency, amount, descriptor=''):
@@ -43,20 +43,20 @@ class PaylikeApiClient:
             "cardId": card_id,
             "descriptor": descriptor,
             "currency": currency,
-            "amount": self._convert_to_paylike_amount(amount)
+            "amount": self.convert_to_paylike_amount(amount)
         })
 
     def get_transaction(self, transaction_id):
-        return self._call_api('/transaction/%s/' % transaction_id)
+        return self._call_api('/transactions/%s' % transaction_id)["transaction"]
 
     def get_transactions(self, limit=100):
         return self._call_api('/merchants/%s/transactions/?limit=%i' % (self.merchant_id, limit))
 
     def refund_transaction(self, transaction_id, amount, descriptor=""):
-        return self._call_api('/transaction/%s/refunds' % transaction_id,
+        return self._call_api('/transactions/%s/refunds' % transaction_id,
                               method='POST',
                               data={
-                                  "amount": self._convert_to_paylike_amount(amount),
+                                  "amount": self.convert_to_paylike_amount(amount),
                                   "descriptor": descriptor
                               })
 
@@ -66,9 +66,12 @@ class PaylikeApiClient:
         auth = ("",self.api_key) if self.api_key is not None else None
 
         r = requests.request(method, url, json=data, headers=headers, params=data, auth=auth)
+        if r.status_code == 200:
+            return r.json()
+        else:
+            return None
 
-        return r.json()
 
-    def _convert_to_paylike_amount(amount):
+    def convert_to_paylike_amount(self, amount):
         assert isinstance(amount, Decimal)
         return int(round(amount * 100))
