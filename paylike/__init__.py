@@ -21,12 +21,12 @@ class PaylikeApiClient:
                 return False, {};
             amount = transaction_response['pendingAmount']
         else:
-            self.convert_to_paylike_amount(amount)
+            amount = self.convert_to_paylike_amount(amount)
 
         return self._call_api('/transactions/%s/voids' % transaction_id,
                               method='POST',
                               data={
-                                  "amount": 100,
+                                  "amount": amount,
                               })
 
     def capture_transaction(self, transaction_id, amount, descriptor='', currency=None):
