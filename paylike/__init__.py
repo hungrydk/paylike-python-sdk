@@ -1,6 +1,8 @@
 import requests
 from decimal import Decimal
 
+from simplejson import JSONDecodeError
+
 
 class PaylikeApiClient:
     api_key = None
@@ -11,11 +13,20 @@ class PaylikeApiClient:
         self.api_key = api_key
         self.merchant_id = merchant_id
 
-    def cancel_transaction(self, transaction_id, amount):
-        return self._call_api('/transaction/%s/voids' % transaction_id,
+    def cancel_transaction(self, transaction_id, amount=None):
+        # If Amount was not given cancel the full amount
+        if amount is None:
+            success, transaction_response = self.get_transaction(transaction_id)
+            if not success:
+                return False, {};
+            amount = transaction_response['pendingAmount']
+        else:
+            self.convert_to_paylike_amount(amount)
+
+        return self._call_api('/transactions/%s/voids' % transaction_id,
                               method='POST',
                               data={
-                                  "amount": self.convert_to_paylike_amount(amount),
+                                  "amount": 100,
                               })
 
     def capture_transaction(self, transaction_id, amount, descriptor='', currency=None):
@@ -26,7 +37,7 @@ class PaylikeApiClient:
         if currency is not None:
             data["currency"] = currency
 
-        return self._call_api('/transaction/%s/captures' % transaction_id,
+        return self._call_api('/transactions/%s/captures' % transaction_id,
                               method='POST',
                               data=data)
 
@@ -47,7 +58,8 @@ class PaylikeApiClient:
         })
 
     def get_transaction(self, transaction_id):
-        return self._call_api('/transactions/%s' % transaction_id)["transaction"]
+        result = self._call_api('/transactions/%s' % transaction_id)
+        return result[0], result[1]["transaction"]
 
     def get_transactions(self, limit=100):
         return self._call_api('/merchants/%s/transactions/?limit=%i' % (self.merchant_id, limit))
@@ -65,11 +77,16 @@ class PaylikeApiClient:
         url = "%s%s" % (self.api_base_url, uri)
         auth = ("",self.api_key) if self.api_key is not None else None
 
-        r = requests.request(method, url, json=data, headers=headers, params=data, auth=auth)
-        if r.status_code == 200:
-            return r.json()
-        else:
-            return None
+        r = requests.request(method, url,
+                             json=data if method in ['POST', 'PUT'] else {},
+                             headers=headers,
+                             params=data if method == 'GET' else {},
+                             auth=auth)
+        try:
+            return (r.status_code == 200, r.json())
+        except JSONDecodeError:
+            return (r.status_code == 200, {})
+
 
 
     def convert_to_paylike_amount(self, amount):
