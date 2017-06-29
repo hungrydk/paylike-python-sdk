@@ -83,9 +83,9 @@ class PaylikeApiClient:
                              params=data if method == 'GET' else {},
                              auth=auth)
         try:
-            return (r.status_code == 200, r.json())
+            return (r.status_code in (200, 201), r.json())
         except JSONDecodeError:
-            return (r.status_code == 200, {})
+            return (r.status_code in (200, 201), {})
 
 
 
