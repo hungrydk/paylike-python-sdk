@@ -1,1 +1,4 @@
 *.pyc
+paylike.egg-info/*
+dist/*
+build/*
