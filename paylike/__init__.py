@@ -41,10 +41,10 @@ class PaylikeApiClient:
                               method='POST',
                               data=data)
 
-    def create_payment_from_transaction(self, transaction_id, currency, amount, descriptior=''):
+    def create_payment_from_transaction(self, transaction_id, currency, amount, descriptor=''):
         return self._call_api('/merchants/%s/transactions/', method='POST', data={
             "transactionId": transaction_id,
-            "descriptor": descriptior,
+            "descriptor": descriptor,
             "currency": currency,
             "amount": self.convert_to_paylike_amount(amount)
         })
