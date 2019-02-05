@@ -1,7 +1,7 @@
+name = "paylike"
+
 import requests
 from decimal import Decimal
-
-from simplejson import JSONDecodeError
 
 
 class PaylikeApiClient:
@@ -84,7 +84,7 @@ class PaylikeApiClient:
                              auth=auth)
         try:
             return (r.status_code in (200, 201), r.json())
-        except JSONDecodeError:
+        except ValueError:
             return (r.status_code in (200, 201), {})
 
 
