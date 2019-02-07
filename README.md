@@ -69,7 +69,7 @@ client.get_transaction(transaction_id)
 Fetch transactions
   - limit: Number,              // optional, the number of transactions to fetch. Default 100
 '''
-client.fetch_transactions(limit=100)
+client.get_transactions(limit=100)
 ```
 #### refund_transaction
 ```python
