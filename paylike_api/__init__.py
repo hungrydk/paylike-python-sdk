@@ -1,4 +1,4 @@
-name = "paylike"
+name = "paylike_api"
 
 import requests
 from decimal import Decimal

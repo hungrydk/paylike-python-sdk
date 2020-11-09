@@ -2,3 +2,4 @@
 paylike.egg-info/*
 dist/*
 build/*
+.idea/*
