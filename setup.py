@@ -10,7 +10,7 @@ def lines(text):
     """
     return [l.strip() for l in text.strip().splitlines() if l.strip()]
 
-setuptools.setup(name='paylike',
+setuptools.setup(name='paylike_api',
     version='1.0',
     description='Python wrapper for paylike.io\'s REST API',
     long_description=long_description,
